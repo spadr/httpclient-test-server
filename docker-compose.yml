@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  nginx:
+    build: ./nginx # Use the Dockerfile in the nginx directory
+    container_name: raspi_test_server_nginx
+    ports:
+      - "80:80"   # Map host port 80 to container port 80
+      - "443:443" # Map host port 443 to container port 443
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro # Mount Nginx config (read-only)
+      - ./nginx/ssl:/etc/nginx/ssl # Mount SSL directory (certs/keys/htpasswd generated here by entrypoint)
+      - ./nginx/logs:/var/log/nginx # Mount log directory
+      - ./test-data:/usr/share/nginx/html/data:ro # Mount test data (read-only)
+    environment:
+      # Pass the Host IP to the entrypoint script if needed for CN, or detect inside
+      # HOST_IP: auto # Example, detection logic moved to entrypoint script
+      BASIC_AUTH_USER: testuser # Default basic auth user
+      BASIC_AUTH_PASS: testpass # Default basic auth password
+    restart: unless-stopped
+    # Use the custom entrypoint to generate credentials on startup
+    entrypoint: ["/entrypoint.sh"]
+    # The default Nginx command will be executed by the entrypoint script
+    command: ["nginx", "-g", "daemon off;"]
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  nginx_ssl: # Named volume might be an alternative if direct mount causes permission issues
+  nginx_logs:

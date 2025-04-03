@@ -1,0 +1,20 @@
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Nginx generated files
+nginx/ssl/*.crt
+nginx/ssl/*.key
+nginx/ssl/*.pem
+nginx/ssl/.htpasswd
+nginx/logs/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Python (if used for helper scripts)
+*.pyc
+__pycache__/
+.venv/
+venv/
